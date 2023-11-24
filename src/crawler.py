@@ -3,6 +3,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import os
 import time
+import spacy
+from spacy.matcher import Matcher
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.alert import Alert
@@ -55,22 +57,21 @@ class Extraction:
                 print(f"Error accessing {url}: {e}")
             return None
         
-    def get_data(self):
-        training_data = []
+    def get_data(self, iterations=100):
+        raw_data = []
         df = Extraction.get_links()
-        ok = 0
-        for idx, row in df.iterrows():
-            if ok != 5:
-                url = row.get('urls', '')
-                if url:
-                    page_text = self.get_url_content(url)
+        for idx, row in df.head(iterations).iterrows():
+            url = row.get('urls', '')
+            if url:
+                page_text = self.get_url_content(url)
                     
-                    if page_text and '404 Page Not Found' not in str(page_text):
-                        training_data.append((url, page_text))
-            else:
-                break
-            ok+=1
-        return training_data
+                if page_text and '404 Page Not Found' not in str(page_text):
+                    raw_data.append((url, page_text))
+        return raw_data
+    
+    def heuristic_matching(self):
+        nlp = spacy.load("en_core_web_sm")
+        raw_data = self.get_data()
                 
         
     def open_url(self, url):
@@ -81,7 +82,7 @@ class Extraction:
         
         
 extraction = Extraction()
-p = extraction.get_data()
+p = extraction.get_data(iterations=5)
 print("this is p")
 for item in p:
     print(item)
