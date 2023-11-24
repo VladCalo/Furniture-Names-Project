@@ -71,7 +71,21 @@ class Extraction:
     
     def heuristic_matching(self):
         nlp = spacy.load("en_core_web_sm")
-        raw_data = self.get_data()
+        raw_data = self.get_data(iterations=2)
+        
+        ex = raw_data[0]
+        doc = nlp(ex[1])
+        matcher = Matcher(nlp.vocab)
+
+        furniture_pattern = [
+            {"POS": {"in": ["NOUN", "PROPN"]}, "OP": "+"},
+        ]
+        
+        matcher.add("FURNITURE", [furniture_pattern])
+        matches = matcher(doc)
+        
+        matched_entities = [(doc[start:end].text, "FURNITURE") for _, start, end in matches]
+        print(matched_entities)
                 
         
     def open_url(self, url):
@@ -82,11 +96,12 @@ class Extraction:
         
         
 extraction = Extraction()
-p = extraction.get_data(iterations=5)
+# p = extraction.get_data(iterations=5)
+p = extraction.heuristic_matching()
 print("this is p")
-for item in p:
-    print(item)
-    print("\n###################\n")
+# for item in p:
+#     print(item)
+#     print("\n###################\n")
 extraction.close()
 
     
