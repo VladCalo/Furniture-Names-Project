@@ -23,6 +23,7 @@ class Extraction:
 
     @staticmethod
     def get_links():
+        print("################################## GETTING LINKS #################################")
         result = subprocess.run(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
         repo_dir = result.stdout.strip()
         csv_path = repo_dir + "/data/links.csv"
@@ -71,6 +72,7 @@ class Extraction:
                 h_texts.append(header.text)
 
             page_text = body_element.text
+            print(f"{url} OK\n")
             return page_text, h_texts
 
         except TimeoutException:
@@ -87,8 +89,10 @@ class Extraction:
         raw_data = []
         h_elements = []
         df = Extraction.get_links()
+        print("################################## GET DATA FROM ALL PAGES #################################")
         for _, row in df.head(iterations).iterrows():
             url = row.get("urls", "")
+            print(f"Getting data from {url}")
             if url:
                 page_text, h_texts = self.get_url_content(url)
 

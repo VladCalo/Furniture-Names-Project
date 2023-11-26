@@ -36,24 +36,9 @@ class Process_Data(Extraction):
         
         preprocessed_text = ' '.join(filtered_tokens)
         return preprocessed_text  
-    
-    def filter_strings(self,input_list):
-        nlp = spacy.load("en_core_web_sm")
-
-        filtered_list = []
-
-        for text in input_list:
-            doc = nlp(text)
-            
-            # Check if the string contains a verb or is a single word
-            if any(token.pos_ == 'VERB' for token in doc) or len(doc) == 1:
-                continue
-            
-            filtered_list.append(text)
-
-        return filtered_list
-    
+        
     def preprocess_raw_data(self):
+        print("################################## PREPROCESSING RAW DATA #################################")
         raw_data, _ = self.get_data()
         text_list = [data[1] for data in raw_data]
         process_data = []
@@ -63,6 +48,7 @@ class Process_Data(Extraction):
         return process_data
     
     def preprocess_h_data(self):
+        print("################################## PREPROCESSING HEADER DATA #################################")
         _, list_of_tuples = self.get_data()
         process_data = []
         for t in list_of_tuples:
@@ -131,6 +117,7 @@ class Process_Data(Extraction):
     def heuristic_matching(self):
         filtered_data = []
         string_list = self.preprocess_h_data()
+        print("################################## STARTED HEURISTING MATCHING #################################")
         for string in string_list:      
             if self.contains_verb_adverb_pronoun_in_context(string):
                 continue
@@ -144,6 +131,7 @@ class Process_Data(Extraction):
         output_csv = repo_dir + "/data/traning_data.csv"
         
         data = self.heuristic_matching()
+        print("################################## LABELING DATA #################################")
         df = pd.DataFrame({"Text": data})
         df['Label'] = "PRODUCT"
         df.to_csv(output_csv, index=False)
