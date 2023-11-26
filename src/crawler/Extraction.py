@@ -59,6 +59,7 @@ class Extraction:
                 )
             except Exception as e:
                 print (f"body Error: {e}")
+                body_element = None
             
             try: 
                 h_elements = WebDriverWait(self.driver, 10).until(
@@ -66,6 +67,7 @@ class Extraction:
                 )
             except Exception as e:
                 print (f"h_elements Error: {e}")
+                h_elements = None
                 
             h_texts = []
             for header in h_elements:
@@ -75,21 +77,18 @@ class Extraction:
             print(f"{url} OK\n")
             return page_text, h_texts
 
-        except TimeoutException:
-            print(f"Timed out waiting for body element on {url}")
-            return None
         except WebDriverException as e:
             if "404" in str(e):
                 print(f"Error 404: {url} not found")
             else:
                 print(f"Error accessing {url}: {e}")
-            return None
+            return None, None
 
     def get_data(self, iterations=100):  
         raw_data = []
         h_elements = []
         df = Extraction.get_links()
-        print("################################## GET DATA FROM ALL PAGES #################################")
+        print("################################## GET DATA FROM PAGES #################################")
         for _, row in df.head(iterations).iterrows():
             url = row.get("urls", "")
             print(f"Getting data from {url}")

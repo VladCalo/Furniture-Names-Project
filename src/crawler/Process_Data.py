@@ -48,8 +48,8 @@ class Process_Data(Extraction):
         return process_data
     
     def preprocess_h_data(self):
-        print("################################## PREPROCESSING HEADER DATA #################################")
         _, list_of_tuples = self.get_data()
+        print("################################## PREPROCESSING HEADER DATA #################################")
         process_data = []
         for t in list_of_tuples:
             l = t[1]
