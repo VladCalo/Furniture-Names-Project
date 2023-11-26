@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import os
 import time
+import subprocess
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 import spacy
 from spacy.matcher import Matcher
@@ -22,7 +23,10 @@ class Extraction:
 
     @staticmethod
     def get_links():
-        csv_path = "/Users/vladcalomfirescu/Desktop/MyFiles/DEV/ML/Veridion-Project/data/links.csv"
+        result = subprocess.run(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        repo_dir = result.stdout.strip()
+        csv_path = repo_dir + "/data/links.csv"
+        
         df = pd.read_csv(csv_path, header=None, names=["urls"])
         return df
 
@@ -62,15 +66,6 @@ class Extraction:
             except Exception as e:
                 print (f"h_elements Error: {e}")
                 
-            # try: 
-            #     a_elements = WebDriverWait(self.driver, 10).until(
-            #         EC.presence_of_all_elements_located(( By.XPATH, "//a"))
-            #     )
-            # except (NoSuchElementException, StaleElementReferenceException) as e:
-            #     print (f"a_elements Error: {e}")
-            
-            # if a_elements:
-            #     h_elements += a_elements
             h_texts = []
             for header in h_elements:
                 h_texts.append(header.text)
@@ -106,8 +101,6 @@ class Extraction:
                     
         h_elements = [(url, h_texts) for url, h_texts in h_elements if h_texts]
         return raw_data, h_elements
-
-
 
     def close(self):
         self.driver.quit()

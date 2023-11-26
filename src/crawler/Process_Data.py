@@ -15,7 +15,7 @@ class Process_Data(Extraction):
         super().__init__(headless=True)
         
     def get_data(self):
-        raw_data, h_elements = super().get_data(iterations=3)
+        raw_data, h_elements = super().get_data()
         super().close()
         return raw_data, h_elements
         
@@ -148,9 +148,6 @@ class Process_Data(Extraction):
         df['Label'] = "PRODUCT"
         df.to_csv(output_csv, index=False)
         
-
-p = Process_Data()
-p.label_data()
 
 
 
