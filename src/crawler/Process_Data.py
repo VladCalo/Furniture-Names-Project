@@ -5,6 +5,8 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from Extraction import Extraction
 import nltk
+import subprocess
+import pandas as pd
 from nltk import pos_tag
 from nltk.corpus import wordnet
 
@@ -136,9 +138,19 @@ class Process_Data(Extraction):
                 filtered_data.append(string)
         return filtered_data
         
+    def label_data(self):
+        result = subprocess.run(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        repo_dir = result.stdout.strip()
+        output_csv = repo_dir + "/data/traning_data.csv"
+        
+        data = self.heuristic_matching()
+        df = pd.DataFrame({"Text": data})
+        df['Label'] = "PRODUCT"
+        df.to_csv(output_csv, index=False)
+        
 
 p = Process_Data()
-m = p.heuristic_matching()
-print(m)
+p.label_data()
+
 
 
