@@ -107,25 +107,7 @@ class Extraction:
         h_elements = [(url, h_texts) for url, h_texts in h_elements if h_texts]
         return raw_data, h_elements
 
-    def heuristic_matching(self):
-        nlp = spacy.load("en_core_web_sm")
-        raw_data, h_texts = self.get_data(iterations=2)
 
-        ex = raw_data[0]
-        doc = nlp(ex[1])
-        matcher = Matcher(nlp.vocab)
-
-        furniture_pattern = [
-            {"POS": {"in": ["NOUN", "PROPN"]}, "OP": "+"},
-        ]
-
-        matcher.add("FURNITURE", [furniture_pattern])
-        matches = matcher(doc)
-
-        matched_entities = [
-            (doc[start:end].text, "FURNITURE") for _, start, end in matches
-        ]
-        print(matched_entities)
 
     def close(self):
         self.driver.quit()
