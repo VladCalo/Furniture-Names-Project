@@ -69,11 +69,18 @@ class Extraction:
                 print (f"h_elements Error: {e}")
                 h_elements = None
                 
-            h_texts = []
-            for header in h_elements:
-                h_texts.append(header.text)
-
-            page_text = body_element.text
+            if h_elements:
+                h_texts = []
+                for header in h_elements:
+                    h_texts.append(header.text)
+            else:
+                h_texts = None
+            
+            if body_element:
+                page_text = body_element.text
+            else:
+                page_text = None
+                
             print(f"{url} OK\n")
             return page_text, h_texts
 

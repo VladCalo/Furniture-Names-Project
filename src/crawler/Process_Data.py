@@ -118,11 +118,14 @@ class Process_Data(Extraction):
         filtered_data = []
         string_list = self.preprocess_h_data()
         print("################################## STARTED HEURISTING MATCHING #################################")
+        unwanted_chars = set(":;!*?/\\[]{}%$@€")
         for string in string_list:      
             if self.contains_verb_adverb_pronoun_in_context(string):
                 continue
             else:
-                filtered_data.append(string)
+                if all(char not in string for char in unwanted_chars):
+                    filtered_data.append(string)
+        
         return filtered_data
         
     def label_data(self):
