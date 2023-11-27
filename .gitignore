@@ -1,2 +1,3 @@
 .venv
 src/crawler/test.py
+src/NER/bert_model
