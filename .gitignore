@@ -2,5 +2,6 @@
 src/crawler/test.py
 src/NER/furniture_model1
 src/NER/furniture_model
+src/NER/bert_model
 data1
 src/crawler/geckodriver.log
