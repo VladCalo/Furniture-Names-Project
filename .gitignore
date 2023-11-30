@@ -5,5 +5,5 @@ src/NER/furniture_model
 src/NER/bert_model
 data1
 src/crawler/geckodriver.log
-
-
+/src/.DS_Store
+.DS_Store
