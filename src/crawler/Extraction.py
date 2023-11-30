@@ -3,34 +3,24 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import os
 import time
+import re
 import subprocess
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 import spacy
+from urllib.parse import urlparse, urljoin
 from spacy.matcher import Matcher
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import WebDriverException, TimeoutException
+from Exploration import Exploration
 
 
-class Extraction:
-    def __init__(self, headless=True) -> None:
-        self.chrome_options = Options()
-        if headless:
-            self.chrome_options.add_argument("--headless")
-        self.driver = webdriver.Chrome(options=self.chrome_options)
-
-    @staticmethod
-    def get_links():
-        print("################################## GETTING LINKS #################################")
-        result = subprocess.run(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
-        repo_dir = result.stdout.strip()
-        csv_path = repo_dir + "/data/links.csv"
-        
-        df = pd.read_csv(csv_path, header=None, names=["urls"])
-        return df
-
+class Extraction(Exploration):
+    def __init__(self, filename, headless=True) -> None:
+        super().__init__(filename=filename, headless=headless)
+   
     def get_url_content(self, url):
         """
         Returns:
@@ -39,8 +29,8 @@ class Extraction:
         """
         try:
             self.driver.get(url)
-            a_elements = h_elements = []
-            time.sleep(10)
+            h_elements = []
+            time.sleep(5)
 
             try:
                 alert = self.driver.switch_to.alert
@@ -91,23 +81,24 @@ class Extraction:
                 print(f"Error accessing {url}: {e}")
             return None, None
 
-    def get_data(self, iterations=100):  
+    def get_data(self):  
         raw_data = []
         h_elements = []
-        df = Extraction.get_links()
+        
+        urls = super().get_all_links(self.initial_links)
         print("################################## GET DATA FROM PAGES #################################")
-        for _, row in df.head(iterations).iterrows():
-            url = row.get("urls", "")
-            print(f"Getting data from {url}")
-            if url:
-                page_text, h_texts = self.get_url_content(url)
+        for url in urls:
+            if self.extract_after_https(url):
+                print(f"Getting data from {url}")
+                if url:
+                    page_text, h_texts = self.get_url_content(url)
 
-                if page_text and "404 Page Not Found" not in str(page_text):
-                    raw_data.append((url, page_text))
+                    if page_text and "404 Page Not Found" not in str(page_text):
+                        raw_data.append((url, page_text))
 
-                if h_texts:
-                    h_texts = [header for header in h_texts if header != "" and "404" not in header]
-                    h_elements.append((url, h_texts))
+                    if h_texts:
+                        h_texts = [header for header in h_texts if header != "" and "404" not in header]
+                        h_elements.append((url, h_texts))
                     
         h_elements = [(url, h_texts) for url, h_texts in h_elements if h_texts]
         return raw_data, h_elements

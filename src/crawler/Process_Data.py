@@ -11,8 +11,8 @@ from nltk import pos_tag
 from nltk.corpus import wordnet
 
 class Process_Data(Extraction):
-    def __init__(self):
-        super().__init__(headless=True)
+    def __init__(self, filename):
+        super().__init__(filename=filename, headless=True)
         
     def get_data(self):
         raw_data, h_elements = super().get_data()
@@ -37,17 +37,27 @@ class Process_Data(Extraction):
         preprocessed_text = ' '.join(filtered_tokens)
         return preprocessed_text  
         
-    def preprocess_raw_data(self):
-        print("################################## PREPROCESSING RAW DATA #################################")
+    def preprocess_raw_data(self, file_name, save_in_file):
+        print("################################## PREPROCESSING RAW HTML DATA #################################")
         raw_data, _ = self.get_data()
         text_list = [data[1] for data in raw_data]
         process_data = []
         for text in text_list:
             preprocess_text = self.preprocess(text)
             process_data.append(preprocess_text)
+            
+        if save_in_file:
+            result = subprocess.run(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+            repo_dir = result.stdout.strip()
+            output_txt = repo_dir + f"/data/{file_name}" 
+            with open(output_txt, 'w') as file:
+                for item in process_data:
+                    print(item)
+                    file.write(f"{item}\n")
+        
         return process_data
     
-    def preprocess_h_data(self):
+    def preprocess_h_data(self, file_name, save_in_file):
         _, list_of_tuples = self.get_data()
         print("################################## PREPROCESSING HEADER DATA #################################")
         process_data = []
@@ -56,7 +66,16 @@ class Process_Data(Extraction):
             for text in l:
                 preprocess_text = self.preprocess(text)
                 process_data.append(preprocess_text)
-        return process_data
+        
+        if save_in_file:
+            result = subprocess.run(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+            repo_dir = result.stdout.strip()
+            output_txt = repo_dir + f"/data/{file_name}" 
+            with open(output_txt, 'w') as file:
+                for item in process_data:
+                    file.write(f"{item}\n")
+                
+        return list(set(process_data))
 
     def contains_verb_adverb_pronoun_in_context(self, sentence):
 
@@ -114,9 +133,9 @@ class Process_Data(Extraction):
 
         return False
 
-    def heuristic_matching(self):
+    def heuristic_matching_h_data(self, file_name, save_in_file):
         filtered_data = []
-        string_list = self.preprocess_h_data()
+        string_list = self.preprocess_h_data(file_name=file_name, save_in_file=save_in_file)
         print("################################## STARTED HEURISTING MATCHING #################################")
         unwanted_chars = set(":;!*?/\\[]{}%$@€")
         for string in string_list:      
@@ -127,13 +146,13 @@ class Process_Data(Extraction):
                     filtered_data.append(string)
         
         return filtered_data
-        
-    def label_data(self):
+               
+    def label_training_data(self, output_file):
         result = subprocess.run(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
         repo_dir = result.stdout.strip()
-        output_csv = repo_dir + "/data/traning_data.csv"
+        output_csv = repo_dir + "/data/" + output_file
         
-        data = self.heuristic_matching()
+        data = self.heuristic_matching_h_data(file_name=None, save_in_file=False)
         print("################################## LABELING DATA #################################")
         df = pd.DataFrame({"Text": data})
         df['Label'] = "PRODUCT"

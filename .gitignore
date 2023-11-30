@@ -1,3 +1,6 @@
 .venv
 src/crawler/test.py
-src/NER/bert_model
+src/NER/furniture_model1
+src/NER/furniture_model
+data1
+src/crawler/geckodriver.log
