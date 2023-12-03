@@ -96,7 +96,7 @@ class Extraction(Exploration):
                 if url:
                     page_text, h_texts = self.get_url_content(url)
 
-                    if page_text and "404 Page Not Found" not in str(page_text):
+                    if page_text and "404" not in str(page_text):
                         raw_data.append((url, page_text))
 
                     if h_texts:
