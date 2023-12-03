@@ -11,8 +11,8 @@ from nltk import pos_tag
 from nltk.corpus import wordnet
 
 class Process_Data(Extraction):
-    def __init__(self, filename):
-        super().__init__(filename=filename, headless=True)
+    def __init__(self, filename, recursive=False):
+        super().__init__(filename=filename, headless=True, recursive=recursive)
         
     def get_data(self):
         raw_data, h_elements = super().get_data()

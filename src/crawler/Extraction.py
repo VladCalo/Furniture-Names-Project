@@ -18,8 +18,8 @@ from Exploration import Exploration
 
 
 class Extraction(Exploration):
-    def __init__(self, filename, headless=True) -> None:
-        super().__init__(filename=filename, headless=headless)
+    def __init__(self, filename, headless=True, recursive=False) -> None:
+        super().__init__(filename=filename, headless=headless, recursive=recursive)
    
     def get_url_content(self, url):
         """
@@ -30,7 +30,7 @@ class Extraction(Exploration):
         try:
             self.driver.get(url)
             h_elements = []
-            time.sleep(5)
+            time.sleep(3)
 
             try:
                 alert = self.driver.switch_to.alert
@@ -85,10 +85,13 @@ class Extraction(Exploration):
         raw_data = []
         h_elements = []
         
-        urls = super().get_all_links(self.initial_links)
+        if self.recursive:
+            urls = super().get_all_links(self.initial_links)
+        else:
+            urls = self.initial_links
         print("################################## GET DATA FROM PAGES #################################")
         for url in urls:
-            if self.extract_after_https(url):
+            # if self.extract_after_https(url):
                 print(f"Getting data from {url}")
                 if url:
                     page_text, h_texts = self.get_url_content(url)

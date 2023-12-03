@@ -18,7 +18,7 @@ from selenium.common.exceptions import WebDriverException, TimeoutException
 
 
 class Exploration:
-    def __init__(self, filename, headless=True) -> None:
+    def __init__(self, filename, headless=True, recursive=False) -> None:
         # self.chrome_options = Options()
         # self.chrome_options.add_argument('--disable-extensions')
         # self.chrome_options.add_argument("--disable-notifications")
@@ -28,6 +28,7 @@ class Exploration:
         # self.driver = webdriver.Chrome(options=self.chrome_options)
         self.driver = webdriver.Firefox()
         self.initial_links= Exploration.get_links(filename)
+        self.recursive = recursive 
         
     @staticmethod
     def get_links(filename):
@@ -57,13 +58,13 @@ class Exploration:
             print(f"Error in extract_after_https: {e}")
         return False
                
-    def get_all_links(self, initial_links, depth=2, visited=set()):
+    def get_all_links(self, initial_links, depth=1, visited=set()):
         if depth <= 0:
             return set()
         unique_links = set()
         for link in initial_links:
             if link is not None:
-                if link not in list(visited) and self.is_valid_https_link(link) and self.extract_after_https(link) == True :
+                if link not in list(visited) and self.is_valid_https_link(link):
                     try:
                         self.driver.get(link)
                         print(link)
@@ -84,5 +85,5 @@ class Exploration:
         # with open("/Users/vladcalomfirescu/Desktop/MyFiles/DEV/ML/Veridion-Project/data/test_data/all_links.csv", 'w') as f:
         #     for link in unique_links:
         #         f.write(link + "\n")
-            
+        
         return list(unique_links)
