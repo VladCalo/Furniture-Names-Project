@@ -5,5 +5,7 @@ src/NER/furniture_model
 src/NER/bert_model
 data1
 src/crawler/geckodriver.log
-/src/.DS_Store
+src/crawler/run3.py
+src/.DS_Store
 .DS_Store
+src/NER/model1.ipynb

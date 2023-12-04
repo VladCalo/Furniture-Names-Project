@@ -38,11 +38,6 @@ class Extraction(Exploration):
             except:
                 pass
 
-            WebDriverWait(self.driver, 30).until(
-                lambda driver: driver.execute_script("return document.readyState")
-                == "complete"
-            )
-
             try:
                 body_element = WebDriverWait(self.driver, 10).until(
                     EC.presence_of_element_located((By.TAG_NAME, "body"))
@@ -77,9 +72,10 @@ class Extraction(Exploration):
         except WebDriverException as e:
             if "404" in str(e):
                 print(f"Error 404: {url} not found")
+                return None, None
             else:
                 print(f"Error accessing {url}: {e}")
-            return None, None
+                return None, None
 
     def get_data(self):  
         raw_data = []

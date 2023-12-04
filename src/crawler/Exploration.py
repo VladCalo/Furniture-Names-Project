@@ -27,6 +27,14 @@ class Exploration:
             # self.chrome_options.add_argument("--headless")
         # self.driver = webdriver.Chrome(options=self.chrome_options)
         self.driver = webdriver.Firefox()
+        self.driver.set_script_timeout(30)
+
+        # Set the page load timeout to a lower value (e.g., 30 seconds)
+        self.driver.set_page_load_timeout(30)
+
+        # Set the implicit wait timeout to a lower value (e.g., 30 seconds)
+        self.driver.implicitly_wait(30)
+        
         self.initial_links= Exploration.get_links(filename)
         self.recursive = recursive 
         
@@ -58,7 +66,7 @@ class Exploration:
             print(f"Error in extract_after_https: {e}")
         return False
                
-    def get_all_links(self, initial_links, depth=1, visited=set()):
+    def get_all_links(self, initial_links, depth=2, visited=set()):
         if depth <= 0:
             return set()
         unique_links = set()

@@ -82,7 +82,7 @@ class Process_Data(Extraction):
         def check_len(s):
             tokens = nltk.word_tokenize(s)
             tokens = [word for word in tokens if word.isalpha()]
-            return len(tokens) <= 2
+            return len(tokens) <= 1
         
         if check_len(sentence):
             return True
@@ -106,27 +106,22 @@ class Process_Data(Extraction):
         nlp = spacy.load("en_core_web_sm")
         doc = nlp(sentence)
 
-        # Check if there is at least one token with a part-of-speech tag of "VERB", "ADV", or "PRON"
         if any(token.pos_ in ["VERB", "ADV", "PRON"] for token in doc):
             if not has_furniture_name(sentence):
                 return True
 
-        # Check if there is at least one token with a head (governing word) that is a "VERB", "ADV", or "PRON"
         if any(token.head.pos_ in ["VERB", "ADV", "PRON"] for token in doc):
             if not has_furniture_name(sentence):
                 return True
 
-        # Check if there is at least one token with a dependency relation of "amod" (adjectival modifier) that is a "VERB", "ADV", or "PRON"
         if any(token.dep_ == "amod" and token.head.pos_ in ["VERB", "ADV", "PRON"] for token in doc):
             if not has_furniture_name(sentence):
                 return True
 
-        # Check if there is at least one token with a child that is a "VERB", "ADV", or "PRON"
         if any(child.pos_ in ["VERB", "ADV", "PRON"] for token in doc for child in token.children):
             if not has_furniture_name(sentence):
                 return True
 
-        # Check if there is at least one token with a sibling that is a "VERB", "ADV", or "PRON"
         if any(sibling.pos_ in ["VERB", "ADV", "PRON"] for token in doc for sibling in token.head.children if sibling != token):
             if not has_furniture_name(sentence):
                 return True
